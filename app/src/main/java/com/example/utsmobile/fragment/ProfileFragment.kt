@@ -1,16 +1,20 @@
 package com.example.utsmobile.fragment
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import com.example.utsmobile.Adapter.ProfileAdapter
 import com.example.utsmobile.Data.profileData
+import com.example.utsmobile.MainActivity
 import com.example.utsmobile.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -24,43 +28,40 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ProfileFragment : Fragment() {
-    lateinit var listView: ListView
-    lateinit var adatepter: ProfileAdapter
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_profile,container,false)
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
-    }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        // Retrieve the stored values from SharedPreferences
+        val sharedPreferences = activity?.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        val email = sharedPreferences?.getString("email", "")
+        val name = sharedPreferences?.getString("name", "")
+        val nim = sharedPreferences?.getString("nim", "")
+        val kelas = sharedPreferences?.getString("kelas", "")
 
-        var containerProfile : FrameLayout = view.findViewById(R.id.containerProfile)
-        // Ambil data dari beritaData
-        val dataProfile = profileData
+        // Display the values
+        view.findViewById<TextView>(R.id.emailTXT).text = "Email: $email"
+        view.findViewById<TextView>(R.id.namaTXT).text = "Nama: $name"
+        view.findViewById<TextView>(R.id.nimTXT).text = "NIM: $nim"
+        view.findViewById<TextView>(R.id.kelasTXT).text = "Kelas: $kelas"
 
-        // Loop melalui data berita dan tambahkan item ke LinearLayout
-        for (berita in dataProfile) {
-            val itemView = layoutInflater.inflate(R.layout.fragment_profile,containerProfile,false)
+        // Handle logout button click
+        val logoutButton = view.findViewById<Button>(R.id.logout)
+        logoutButton.setOnClickListener {
+            // Clear the shared preferences
+            sharedPreferences?.edit()?.clear()?.apply()
 
-            val imageProfile: ImageView = itemView.findViewById(R.id.imageProfile)
-            val emailProfile: TextView = itemView.findViewById(R.id.emailTXT)
-            val nimProfile: TextView = itemView.findViewById(R.id.nimTXT)
-            val namaProfile: TextView = itemView.findViewById(R.id.namaTXT)
-            val kelasProfile: TextView = itemView.findViewById(R.id.kelasTXT)
-
-            imageProfile.setImageResource(berita.imageResId)
-            emailProfile.text = "Email : " + berita.email
-            nimProfile.text = "NIM : " + berita.nim
-            namaProfile.text = "Nama : " + berita.nama
-            kelasProfile.text = "Kelas: " + berita.kelas
-
-            containerProfile.addView(itemView)
+            // Navigate back to MainActivity
+            val intent = Intent(activity, MainActivity::class.java)
+            startActivity(intent)
+            activity?.finish()  // Optional: close the current activity
         }
 
+        return view
     }
 
 }
